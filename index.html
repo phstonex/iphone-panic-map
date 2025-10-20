@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>iPhone Panic 位掩码 → 配件速查（含16系列）</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #111111;
+      --muted: #666;
+      --accent: #0b5fff;
+      --border: #ddd;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; margin: 0; background: var(--bg); color: var(--fg); }
+    header { padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(255,255,255,.9); backdrop-filter: blur(6px); }
+    h1 { font-size: 20px; margin: 0 0 8px 0; }
+    p.subtitle { margin: 0; color: var(--muted); font-size: 13px; }
+    .container { padding: 16px 20px; max-width: 1200px; margin: 0 auto; }
+    .toolbar { display:flex; gap:12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+    input[type="search"] { flex:1; min-width:280px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:14px; outline: none; }
+    .pill { border:1px solid var(--border); padding:6px 10px; border-radius:999px; font-size:12px; cursor:pointer; user-select:none; }
+    .pill.active { background: var(--accent); color:#fff; border-color: var(--accent); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid var(--border); padding: 10px 8px; text-align: left; vertical-align: middle; }
+    th { font-size: 12px; color: var(--muted); background:#fafafa; position: sticky; top: 80px; z-index: 1; }
+    td.code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-align:center; white-space: nowrap; }
+    .footer { color: var(--muted); font-size: 12px; padding: 16px 20px; }
+    .legend { display:flex; gap:8px; flex-wrap: wrap; }
+    .legend .tag { font-size: 11px; border:1px solid var(--border); padding:4px 8px; border-radius:999px; }
+    @media (max-width: 720px) {
+      th:nth-child(3), td:nth-child(3) { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>iPhone Panic 位掩码 → 配件速查（含16系列）</h1>
+    <p class="subtitle">快速三步：① 读取 panic.full → “S.sensor array”；② 按位掩码逐位比对；③ 对应配件依次排查。</p>
+  </header>
+  <div class="container">
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="输入机型 / 位码(如 0x300000) / 配件 / 症状 关键字搜索…" />
+      <span class="pill" data-filter="全部">全部</span>
+      <span class="pill" data-filter="13">13 系列</span>
+      <span class="pill" data-filter="14">14 系列</span>
+      <span class="pill" data-filter="15">15 系列</span>
+      <span class="pill active" data-filter="16">16 系列</span>
+    </div>
+    <div class="legend" style="margin-bottom:8px;">
+      <span class="tag">⚙️ 尾插/充电口 → 常见 3 分钟重启</span>
+      <span class="tag">🪫 电池/数据 → 高负载掉电/热保护</span>
+      <span class="tag">📡 无线充线圈 → 充电触发重启</span>
+      <span class="tag">🌓 前感应排线 → 通话黑屏/亮度异常</span>
+      <span class="tag">🧭 陀螺仪 → 旋转触发 panic</span>
+    </div>
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th style="width:22%;">机型/系列</th>
+          <th style="width:16%;">特征代码 (hex)</th>
+          <th style="width:38%;">对应配件/部位</th>
+          <th style="width:24%;">典型症状</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="footer container">
+    <div>© 2025 phstonex · 本页为静态速查表，建议结合 panic 日志原文核对。</div>
+  </div>
+  <script>
+    const DATA = [{"机型/系列": "iPhone 13/13 Pro/13 Pro Max (13 系列)", "特征代码(hex)": "0x10000", "对应配件/部位": "前感应排线（听筒/距离/光感）", "典型症状": "通话黑屏/亮度异常"}, {"机型/系列": "iPhone 13/13 Pro/13 Pro Max (13 系列)", "特征代码(hex)": "0x800", "对应配件/部位": "充电口柔性板（尾插）", "典型症状": "3分钟重启/循环重启"}, {"机型/系列": "iPhone 13/13 Pro/13 Pro Max (13 系列)", "特征代码(hex)": "0x40000", "对应配件/部位": "电池", "典型症状": "高负载掉电/热保护"}, {"机型/系列": "iPhone 13 mini", "特征代码(hex)": "0x400", "对应配件/部位": "陀螺仪（下层小板）", "典型症状": "旋转触发panic"}, {"机型/系列": "iPhone 14/14 Plus", "特征代码(hex)": "0x100000", "对应配件/部位": "充电口柔性板（尾插）", "典型症状": "3分钟重启/循环重启"}, {"机型/系列": "iPhone 14/14 Plus", "特征代码(hex)": "0x200000", "对应配件/部位": "前感应排线（听筒/距离/光感）", "典型症状": "通话黑屏/亮度异常"}, {"机型/系列": "iPhone 14/14 Plus", "特征代码(hex)": "0x400000", "对应配件/部位": "无线充线圈/背板组件", "典型症状": "充电瞬断/发热"}, {"机型/系列": "iPhone 14/14 Plus", "特征代码(hex)": "0x500000", "对应配件/部位": "电池", "典型症状": "高负载掉电/热保护"}, {"机型/系列": "iPhone 14 Pro/14 Pro Max", "特征代码(hex)": "0x41", "对应配件/部位": "电池", "典型症状": "高负载掉电/热保护"}, {"机型/系列": "iPhone 14 Pro/14 Pro Max", "特征代码(hex)": "0x20000", "对应配件/部位": "陀螺仪（下层小板）", "典型症状": "旋转触发panic"}, {"机型/系列": "iPhone 14 Pro/14 Pro Max", "特征代码(hex)": "0x40000", "对应配件/部位": "充电口柔性板（尾插）", "典型症状": "3分钟重启/循环重启"}, {"机型/系列": "iPhone 14 Pro/14 Pro Max", "特征代码(hex)": "0x80000", "对应配件/部位": "前感应排线（听筒/距离/光感）", "典型症状": "通话黑屏/亮度异常"}, {"机型/系列": "iPhone 14 Pro/14 Pro Max", "特征代码(hex)": "0x100000", "对应配件/部位": "电源键排线", "典型症状": "—"}, {"机型/系列": "iPhone 15/15 Plus", "特征代码(hex)": "0x80000", "对应配件/部位": "充电口柔性板（尾插）", "典型症状": "3分钟重启/循环重启"}, {"机型/系列": "iPhone 15/15 Plus", "特征代码(hex)": "0x100000", "对应配件/部位": "前感应排线（听筒/距离/光感）", "典型症状": "通话黑屏/亮度异常"}, {"机型/系列": "iPhone 15/15 Plus", "特征代码(hex)": "0x200000", "对应配件/部位": "无线充线圈/背板组件", "典型症状": "充电瞬断/发热"}, {"机型/系列": "iPhone 15 Pro/15 Pro Max", "特征代码(hex)": "0xA1", "对应配件/部位": "电池", "典型症状": "高负载掉电/热保护"}, {"机型/系列": "iPhone 15 Pro/15 Pro Max", "特征代码(hex)": "0x300000", "对应配件/部位": "充电口柔性板（尾插）", "典型症状": "3分钟重启/循环重启"}, {"机型/系列": "iPhone 15 Pro/15 Pro Max", "特征代码(hex)": "0x400000", "对应配件/部位": "无线充线圈/背板组件", "典型症状": "充电瞬断/发热"}, {"机型/系列": "iPhone 16/16 Plus", "特征代码(hex)": "0x80000", "对应配件/部位": "充电口柔性板（含气压/空气传感器）", "典型症状": "3分钟重启/循环重启"}, {"机型/系列": "iPhone 16/16 Plus", "特征代码(hex)": "0x180000", "对应配件/部位": "充电口柔性板（含气压/空气传感器）", "典型症状": "3分钟重启/循环重启"}, {"机型/系列": "iPhone 16 Pro/16 Pro Max", "特征代码(hex)": "0x300000", "对应配件/部位": "充电口柔性板（尾插）", "典型症状": "3分钟重启/循环重启"}, {"机型/系列": "iPhone 16 Pro/16 Pro Max（待验证）", "特征代码(hex)": "0x400000", "对应配件/部位": "无线充线圈/背板组件", "典型症状": "充电瞬断/发热"}, {"机型/系列": "iPhone 16 Pro/16 Pro Max（待验证）", "特征代码(hex)": "0xA1", "对应配件/部位": "电池数据/电池", "典型症状": "高负载掉电/热保护"}];
+
+    const q = document.getElementById('q');
+    const tbody = document.querySelector('#tbl tbody');
+    const pills = Array.from(document.querySelectorAll('.pill'));
+
+    let filterSeries = '16'; // 默认展示 16 系列
+    let query = '';
+
+    function render() {
+      const rows = DATA.filter(r => {
+        const hitSeries = (filterSeries === '全部') || (r['机型/系列'].includes(filterSeries));
+        const text = (r['机型/系列'] + ' ' + r['特征代码(hex)'] + ' ' + r['对应配件/部位'] + ' ' + r['典型症状']).toLowerCase();
+        const hitQuery = !query || text.includes(query.toLowerCase());
+        return hitSeries && hitQuery;
+      });
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td>${r['机型/系列']}</td>
+          <td class="code">${r['特征代码(hex)']}</td>
+          <td>${r['对应配件/部位']}</td>
+          <td>${r['典型症状']}</td>
+        </tr>
+      `).join('');
+    }
+
+    q.addEventListener('input', e => { query = e.target.value; render(); });
+    pills.forEach(p => p.addEventListener('click', () => {
+      pills.forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      filterSeries = p.dataset.filter;
+      render();
+    }));
+
+    render();
+  </script>
+</body>
+</html>
